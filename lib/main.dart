@@ -41,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<List> getRestaurants() async {
     print("hi");
     final response = await http.get(
-        Uri.parse('http://192.168.100.151:8080/api/restaurant/all'),
+        Uri.parse('http://ejun.kro.kr/api/restaurant/all'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });
@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> addRestaurant(String value) async {
     Map<String, String> data = {"name": value};
     final response =
-        await http.post(Uri.parse('http://192.168.100.151:8080/api/restaurant/'),
+        await http.post(Uri.parse('http://ejun.kro.kr/api/restaurant/'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },

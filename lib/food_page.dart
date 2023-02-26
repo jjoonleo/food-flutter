@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class FoodPage extends StatefulWidget{
+class FoodPage extends StatefulWidget {
   const FoodPage({super.key, required this.title});
 
   final String title;
@@ -26,8 +26,7 @@ class _FoodPageState extends State<FoodPage> {
   String? gender = "man";
 
   Future<void> addFood(Map<String, dynamic> value) async {
-    final response =
-    await http.post(Uri.parse('http://192.168.100.151:8080/api/food/'),
+    final response = await http.post(Uri.parse('http://ejun.kro.kr/api/food/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -37,23 +36,28 @@ class _FoodPageState extends State<FoodPage> {
     final result = json.decode(utf8.decode(response.bodyBytes));
     if (response.statusCode == 201) {
       print(json.decode(utf8.decode(response.bodyBytes)));
-    } else{
+      Navigator.of(context).pop();
+    } else {
       //throw Exception("Failed to add restaurantto database");
     }
   }
 
-  void _submit(){
-    final bool flag = _formKey.currentState?.validate() ?? true;
-    print(flag);
-    if(!flag){
+  void _submit() {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
     _formKey.currentState?.save();
-    Map<String, dynamic> inputValues = Map.of(_formKey.currentState?.value ?? {});
+    Map<String, dynamic> inputValues = Map.of(_formKey.currentState!.value);
 
     inputValues["restaurant"] = widget.title;
     print(_formKey.currentState?.value);
     addFood(inputValues);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    
   }
 
   @override
@@ -64,12 +68,12 @@ class _FoodPageState extends State<FoodPage> {
       ),
       body: FormBuilder(
         key: _formKey,
-        child:  ListView(
+        child: ListView(
           children: [
             Text("이름", style: TextStyle(fontSize: 20)),
             FormBuilderTextField(
               name: "name",
-              autovalidateMode: AutovalidateMode.onUserInteraction,
+              autovalidateMode: AutovalidateMode.always,
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
               ]),
@@ -80,7 +84,7 @@ class _FoodPageState extends State<FoodPage> {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
               ]),
-              builder: (FormFieldState<dynamic> field){
+              builder: (FormFieldState<dynamic> field) {
                 return InputDecorator(
                   decoration: InputDecoration(
                     labelText: "맵기",
@@ -89,14 +93,13 @@ class _FoodPageState extends State<FoodPage> {
                       color: Colors.black54,
                     ),
                     contentPadding:
-                    const EdgeInsets.only(top: 10.0, bottom: 0.0),
+                        const EdgeInsets.only(top: 10.0, bottom: 0.0),
                     border: InputBorder.none,
                     errorText: field.errorText,
                   ),
                   child: SizedBox(
                     height: pickerHeight,
                     child: CupertinoPicker(
-
                       itemExtent: 30,
                       children: spicyOptions.map((c) => Text(c)).toList(),
                       onSelectedItemChanged: (index) {
@@ -113,7 +116,7 @@ class _FoodPageState extends State<FoodPage> {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
               ]),
-              builder: (FormFieldState<dynamic> field){
+              builder: (FormFieldState<dynamic> field) {
                 return InputDecorator(
                   decoration: InputDecoration(
                     labelText: "온도",
@@ -122,14 +125,13 @@ class _FoodPageState extends State<FoodPage> {
                       color: Colors.black54,
                     ),
                     contentPadding:
-                    const EdgeInsets.only(top: 10.0, bottom: 0.0),
+                        const EdgeInsets.only(top: 10.0, bottom: 0.0),
                     border: InputBorder.none,
                     errorText: field.errorText,
                   ),
                   child: SizedBox(
                     height: pickerHeight,
                     child: CupertinoPicker(
-
                       itemExtent: 30,
                       children: temperatureOptions.map((c) => Text(c)).toList(),
                       onSelectedItemChanged: (index) {
@@ -146,7 +148,7 @@ class _FoodPageState extends State<FoodPage> {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
               ]),
-              builder: (FormFieldState<dynamic> field){
+              builder: (FormFieldState<dynamic> field) {
                 return InputDecorator(
                   decoration: InputDecoration(
                     labelText: "나라",
@@ -155,14 +157,13 @@ class _FoodPageState extends State<FoodPage> {
                       color: Colors.black54,
                     ),
                     contentPadding:
-                    const EdgeInsets.only(top: 10.0, bottom: 0.0),
+                        const EdgeInsets.only(top: 10.0, bottom: 0.0),
                     border: InputBorder.none,
                     errorText: field.errorText,
                   ),
                   child: SizedBox(
                     height: pickerHeight,
                     child: CupertinoPicker(
-
                       itemExtent: 30,
                       children: countryOptions.map((c) => Text(c)).toList(),
                       onSelectedItemChanged: (index) {
@@ -179,7 +180,7 @@ class _FoodPageState extends State<FoodPage> {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
               ]),
-              builder: (FormFieldState<dynamic> field){
+              builder: (FormFieldState<dynamic> field) {
                 return InputDecorator(
                   decoration: InputDecoration(
                     labelText: "주재료",
@@ -188,14 +189,13 @@ class _FoodPageState extends State<FoodPage> {
                       color: Colors.black54,
                     ),
                     contentPadding:
-                    const EdgeInsets.only(top: 10.0, bottom: 0.0),
+                        const EdgeInsets.only(top: 10.0, bottom: 0.0),
                     border: InputBorder.none,
                     errorText: field.errorText,
                   ),
                   child: SizedBox(
                     height: pickerHeight,
                     child: CupertinoPicker(
-
                       itemExtent: 30,
                       children: ingreOptions.map((c) => Text(c)).toList(),
                       onSelectedItemChanged: (index) {
@@ -208,30 +208,34 @@ class _FoodPageState extends State<FoodPage> {
             ),
             FormBuilderCheckbox(
               initialValue: false,
-              name: "isSweet", title: Text("달아요"),
+              name: "isSweet",
+              title: Text("달아요"),
             ),
             FormBuilderCheckbox(
               initialValue: false,
-              name: "isSalty", title: Text("짜요"),
+              name: "isSalty",
+              title: Text("짜요"),
             ),
             FormBuilderCheckbox(
               initialValue: false,
-              name: "togo", title: Text("포장가능"),
+              name: "togo",
+              title: Text("포장가능"),
             ),
             FormBuilderCheckbox(
               initialValue: false,
-              name: "delivery", title: Text("배달가능"),
+              name: "delivery",
+              title: Text("배달가능"),
             ),
             FormBuilderCheckbox(
               initialValue: false,
-              name: "store", title: Text("매장가능"),
+              name: "store",
+              title: Text("매장가능"),
             ),
             FormBuilderCheckbox(
               initialValue: false,
-              name: "cal", title: Text("칼로리 900 이상"),
+              name: "cal",
+              title: Text("칼로리 900 이상"),
             ),
-
-
             CupertinoButton(
               onPressed: _submit,
               child: const Text("submit"),
