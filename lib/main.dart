@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_hello_world/food_page.dart';
 import 'package:flutter_application_hello_world/theme.dart';
@@ -14,12 +15,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const foodTheme = FoodTheme();
-    return MaterialApp(
-      title: 'Food',
-      theme: foodTheme.toThemeData(),
-      darkTheme: foodTheme.toDarkThemeData(),
-      themeMode: ThemeMode.system,
-      home: const MyHomePage(title: ''),
+    return DynamicColorBuilder(
+      builder: (lightColorScheme, darkColorScheme) {
+        return MaterialApp(
+          title: 'Food',
+          theme: foodTheme.toThemeData(lightColorScheme),
+          darkTheme: foodTheme.toThemeData(darkColorScheme),
+          themeMode: ThemeMode.system,
+          home: const MyHomePage(title: ''),
+        );
+      }
     );
   }
 }
@@ -116,16 +121,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    
+    final theme = Theme.of(context);
+
     final ButtonStyle btnStyle = TextButton.styleFrom(
-      foregroundColor: Colors.white,
-      backgroundColor: Colors.blue,
+      foregroundColor: theme.primaryColorDark,
+      backgroundColor: Theme.of(context).primaryColorLight,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       minimumSize: const Size(100, 40),
     );
-    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -155,12 +162,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
-                            color: colorScheme.primary,
+                            color: theme.primaryColor,
                             width: 2.0),
                       ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
-                            color: colorScheme.primary,
+                            color: theme.primaryColor,
                             width: 2.0),
                       ),
                       hintText: "",
@@ -187,23 +194,23 @@ class _MyHomePageState extends State<MyHomePage> {
                 //     ),
                 //   ),
                 // ),
-                // TextButton(
-                //   style: btnStyle,
-                //   onPressed: () {
-                //     addRestaurant(_controller.text);
-                //   },
-                //   child: const Text('submit'),
-                // ),
+                TextButton(
+                  style: btnStyle,
+                  onPressed: () {
+                    addRestaurant(_controller.text);
+                  },
+                  child: const Text('submit'),
+                ),
               ],
             ),
           ),
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

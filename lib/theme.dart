@@ -10,8 +10,8 @@ class FoodTheme extends ThemeExtension<FoodTheme> {
 
   final Color primaryColor;
 
-  ThemeData toThemeData() {
-    final colorScheme = _scheme().toColorScheme(Brightness.dark);
+  ThemeData toThemeData(ColorScheme? colorScheme) {
+    colorScheme = colorScheme ?? _scheme().toColorScheme(Brightness.dark);
     return _base(colorScheme).copyWith(brightness: colorScheme.brightness);
   }
 
@@ -19,6 +19,7 @@ class FoodTheme extends ThemeExtension<FoodTheme> {
     return ThemeData(
       useMaterial3: true,
       colorScheme: lightColorScheme,
+
     );
   }
 
@@ -35,8 +36,14 @@ class FoodTheme extends ThemeExtension<FoodTheme> {
       useMaterial3: true,
       extensions: [this],
       colorScheme: colorScheme,
+      primaryColor: colorScheme.primary,
+      primaryColorLight: Color.alphaBlend(Colors.white.withAlpha(0x59), colorScheme.primary),
+      primaryColorDark: Color.alphaBlend(Colors.black.withAlpha(0x72), colorScheme.primary),
       scaffoldBackgroundColor:
           isLight ? primaryColor : colorScheme.background,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.background
+      ) 
     );
   }
 
