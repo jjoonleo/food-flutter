@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_hello_world/food_page.dart';
+import 'package:flutter_application_hello_world/theme.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -12,12 +13,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const foodTheme = FoodTheme();
     return MaterialApp(
       title: 'Food',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Home Page'),
+      theme: foodTheme.toThemeData(),
+      darkTheme: foodTheme.toDarkThemeData(),
+      themeMode: ThemeMode.system,
+      home: const MyHomePage(title: ''),
     );
   }
 }
@@ -49,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (response.statusCode == 200) {
       // If the server did return a 201 CREATED response,
       // then parse the JSON.
-      List result = json.decode(response.body).toList();
+      List result = json.decode(response.body)["result"].toList();
       return result;
     } else {
       List result = [];
@@ -74,14 +76,15 @@ class _MyHomePageState extends State<MyHomePage> {
         inputText = "입력을 성공했습니다.";
       });
       reloadRestaurants();
-    } else if(response.statusCode == 405) {
+    } else if (response.statusCode == 405) {
       print(result["error"]["code"]);
-      if(result["error"]["code"] == 11000) { //duplicate key error
+      if (result["error"]["code"] == 11000) {
+        //duplicate key error
         setState(() {
           inputText = "중복된 값은 입력할 수 없습니다.";
         });
       }
-    }else {
+    } else {
       //throw Exception("Failed to add restaurantto database");
     }
   }
@@ -122,69 +125,77 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       minimumSize: const Size(100, 40),
     );
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        elevation: 0,
       ),
-      body: Center(
-        child: Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                '$inputText',
-                style: const TextStyle(
-                  fontSize: 17,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10.0),
-                child: TextField(
-                  controller: _controller,
-                  decoration: const InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(131, 133, 107, 206), width: 2.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                      borderSide: BorderSide(
-                        width: 2.0,
-                        color: Color.fromARGB(255, 73, 47, 145),
-                      ),
-                    ),
-                    hintText: "input text",
+      body: Container(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 44, horizontal: 30),
+          child: Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  '검색할 매장을 입력하세요.',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontFamily: "NotoSansKR",
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -1,
                   ),
-                  onChanged: (value) => _onInputTextChanged(value),
+                  textAlign: TextAlign.start,
                 ),
-              ),
-              TextButton(
-                style: btnStyle,
-                onPressed: () {
-                  addRestaurant(_controller.text);
-                },
-                child: const Text('submit'),
-              ),
-              Expanded(
-                child: SizedBox(
-                  width: 300,
-                  child: FutureBuilder<List<dynamic>>(
-                      future: restaurants,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return RestaurantList(data: snapshot.data);
-                        } else if (snapshot.hasError) {
-                          return Text('${snapshot.error}');
-                        } else {
-                          return const Text("loading");
-                        }
-                      }),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: colorScheme.primary,
+                            width: 2.0),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: colorScheme.primary,
+                            width: 2.0),
+                      ),
+                      hintText: "",
+                    ),
+                    cursorColor: Color(0xff42685C),
+                    onChanged: (value) => _onInputTextChanged(value),
+                  ),
                 ),
-              ),
-            ],
+                // Expanded(
+                //   child: Center(
+                //     child: SizedBox(
+                //       width: 300,
+                //       child: FutureBuilder<List<dynamic>>(
+                //           future: restaurants,
+                //           builder: (context, snapshot) {
+                //             if (snapshot.hasData) {
+                //               return RestaurantList(data: snapshot.data);
+                //             } else if (snapshot.hasError) {
+                //               return Text('${snapshot.error}');
+                //             } else {
+                //               return const Text("loading");
+                //             }
+                //           }),
+                //     ),
+                //   ),
+                // ),
+                // TextButton(
+                //   style: btnStyle,
+                //   onPressed: () {
+                //     addRestaurant(_controller.text);
+                //   },
+                //   child: const Text('submit'),
+                // ),
+              ],
+            ),
           ),
         ),
       ),
@@ -222,7 +233,8 @@ class _RestaurantListState extends State<RestaurantList> {
                   child: MaterialButton(
                     color: const Color.fromARGB(255, 246, 245, 245),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15.0, horizontal: 20.0),
                       child: Text(
                         restaurantName,
                         style: const TextStyle(
@@ -230,12 +242,10 @@ class _RestaurantListState extends State<RestaurantList> {
                         ),
                       ),
                     ),
-                    onPressed: (){
-                      Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => FoodPage(title: restaurantName),
-                          )
-                      );
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => FoodPage(title: restaurantName),
+                      ));
                     },
                   ),
                 );
